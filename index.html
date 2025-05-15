@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WORD PLAY SUDOKU: A VOCABULARY ADVENTURE</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background-color: #4a6fa5;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+        
+        .header h2 {
+            font-size: 1.5em;
+            margin: 10px 0 0;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            margin: 5px 0;
+        }
+        
+        .game-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .controls {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        select, button {
+            padding: 10px;
+            margin-right: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        button {
+            background-color: #4a6fa5;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #3a5a8f;
+        }
+        
+        .sudoku-container {
+            flex: 1;
+            min-width: 300px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .vocab-container {
+            flex: 1;
+            min-width: 300px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        table {
+            border-collapse: collapse;
+            margin: 0 auto;
+        }
+        
+        td {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            vertical-align: middle;
+            border: 1px solid #ddd;
+            position: relative;
+        }
+        
+        /* Bold borders for 4x4 grid */
+        .grid-4x4 td {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .grid-4x4 tr:nth-child(2) td {
+            border-top: 3px solid #333;
+        }
+        
+        .grid-4x4 td:nth-child(2) {
+            border-left: 3px solid #333;
+        }
+        
+        /* Bold borders for 6x6 grid */
+        .grid-6x6 td {
+            width: 40px;
+            height: 40px;
+        }
+        
+        .grid-6x6 tr:nth-child(2) td,
+        .grid-6x6 tr:nth-child(4) td {
+            border-top: 3px solid #333;
+        }
+        
+        .grid-6x6 td:nth-child(2),
+        .grid-6x6 td:nth-child(4) {
+            border-left: 3px solid #333;
+        }
+        
+        /* Bold borders for 9x9 grid */
+        .grid-9x9 td {
+            width: 35px;
+            height: 35px;
+            font-size: 0.9em;
+        }
+        
+        .grid-9x9 tr:nth-child(2) td,
+        .grid-9x9 tr:nth-child(4) td,
+        .grid-9x9 tr:nth-child(7) td {
+            border-top: 3px solid #333;
+        }
+        
+        .grid-9x9 td:nth-child(2),
+        .grid-9x9 td:nth-child(4),
+        .grid-9x9 td:nth-child(7) {
+            border-left: 3px solid #333;
+        }
+        
+        input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            text-align: center;
+            font-size: 16px;
+            background-color: transparent;
+        }
+        
+        .filled {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+        
+        .correct {
+            background-color: #d4edda;
+        }
+        
+        .incorrect {
+            background-color: #f8d7da;
+        }
+        
+        .word-list {
+            margin-top: 20px;
+        }
+        
+        .word-list h3 {
+            margin-bottom: 10px;
+        }
+        
+        .word-list ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .word-list li {
+            margin-bottom: 5px;
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .instructions {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .cefr-info {
+            background-color: #e2e3e5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .difficulty {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .effortless {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .manageable {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+        
+        .tolerable {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .challenging {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .backbreaking {
+            background-color: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>WORD PLAY SUDOKU</h1>
+        <h2>A VOCABULARY ADVENTURE</h2>
+        <p>EXPAND YOUR ENGLISH VOCABULARY</p>
+        <p>by AFFIQ AZLAN</p>
+    </div>
+    
+    <div class="instructions">
+        <h2>How to Play Word Sudoku</h2>
+        <p>To play the word sudoku games in this book, first select a game based on the vocabulary theme you want to practice. Then, identify the level and difficulty that is appropriate for your skills. Each word sudoku consists of a grid with spaces to fill in vocabulary words from the theme provided. Each row, column, and square in the grid must contain every word from the theme once, without repetition. Use the clues provided to figure out which word belongs in which space. The goal is to complete the entire grid with all the words from the theme without any repetition errors. It is possible your answers could be different from the sample answers given, and still correct. These games are a fun way to practice vocabulary and can be played individually or in groups. They are suitable for students, adults, and English language learners of all levels.</p>
+    </div>
+    
+    <div class="cefr-info">
+        <h2>Common European Framework of Reference for Languages (CEFR) Levels:</h2>
+        <p><strong>A1:</strong> A basic vocabulary of isolated words and phrases related to particular concrete situations.</p>
+        <p><strong>A2:</strong> A basic vocabulary of isolated phrases and expressions concerning personal and concrete immediate needs. Can describe in simple terms aspects of their background, immediate environment and matters in areas of immediate need.</p>
+        <p><strong>B1:</strong> An everyday vocabulary covering areas such as basic personal and family information, shopping, local geography, employment. Can use a range of simple and compound sentence structures, although errors and hesitation are often apparent.</p>
+        <p><strong>B2:</strong> A wide range of vocabulary within the relevant field or discourse with an awareness of connotation. Can express themselves fluently and spontaneously, using discourse markers and connectors to link ideas together.</p>
+        <p><strong>C1:</strong> A broad range of idiomatic expressions, colloquialisms and proverbial expressions. Can express themselves fluently and spontaneously, with a high degree of precision and naturalness.</p>
+        <p><strong>C2:</strong> A very wide range of vocabulary, including idiomatic expressions and colloquialisms, showing complete awareness of register and style. Can understand with ease virtually everything heard or read, expressing themselves spontaneously, very fluently and precisely.</p>
+    </div>
+    
+    <div class="controls">
+        <h2>Select a Vocabulary Theme:</h2>
+        <select id="theme-select">
+            <option value="">-- Select a Theme --</option>
+            <optgroup label="CEFR Level A1">
+                <option value="animals">ANIMALS</option>
+                <option value="body-parts">BODY PARTS</option>
+                <option value="clothing">CLOTHING</option>
+                <option value="colors">COLORS</option>
+                <option value="countries">COUNTRIES</option>
+                <option value="emotions">EMOTIONS</option>
+                <option value="family-members">FAMILY MEMBERS</option>
+                <option value="food-and-drink">FOOD AND DRINK</option>
+                <option value="fruits">FRUITS</option>
+                <option value="hobbies">HOBBIES</option>
+            </optgroup>
+            <optgroup label="CEFR Level A2">
+                <option value="holidays">HOLIDAYS</option>
+                <option value="house-and-home">HOUSE AND HOME</option>
+                <option value="jobs-and-professions">JOBS AND PROFESSIONS</option>
+                <option value="kitchen-items">KITCHEN ITEMS</option>
+                <option value="music">MUSIC</option>
+                <option value="musical-instruments">MUSICAL INSTRUMENTS</option>
+                <option value="nature">NATURE</option>
+                <option value="occupations">OCCUPATIONS</option>
+                <option value="parts-of-speech">PARTS OF SPEECH</option>
+                <option value="personality-traits">PERSONALITY TRAITS</option>
+            </optgroup>
+            <optgroup label="CEFR Level B1">
+                <option value="places">PLACES</option>
+                <option value="plants">PLANTS</option>
+                <option value="prepositions">PREPOSITIONS</option>
+                <option value="pronouns">PRONOUNS</option>
+                <option value="school-subjects">SCHOOL SUBJECTS</option>
+                <option value="science">SCIENCE</option>
+                <option value="shapes">SHAPES</option>
+                <option value="sports">SPORTS</option>
+                <option value="technology">TECHNOLOGY</option>
+                <option value="time">TIME</option>
+            </optgroup>
+            <optgroup label="CEFR Level B2">
+                <option value="tools">TOOLS</option>
+                <option value="transportation">TRANSPORTATION</option>
+                <option value="travel">TRAVEL</option>
+                <option value="weather">WEATHER</option>
+                <option value="adjectives">ADJECTIVES</option>
+                <option value="adverbs">ADVERBS</option>
+                <option value="art">ART</option>
+                <option value="astronomy">ASTRONOMY</option>
+                <option value="beauty">BEAUTY</option>
+                <option value="books-and-literature">BOOKS AND LITERATURE</option>
+            </optgroup>
+            <optgroup label="CEFR Level C1">
+                <option value="business">BUSINESS</option>
+                <option value="chemistry">CHEMISTRY</option>
+                <option value="cities">CITIES</option>
+                <option value="clothes-and-fashion">CLOTHES AND FASHION</option>
+                <option value="communication">COMMUNICATION</option>
+                <option value="computer-and-internet">COMPUTER AND INTERNET</option>
+                <option value="crime-and-punishment">CRIME AND PUNISHMENT</option>
+                <option value="culture">CULTURE</option>
+                <option value="economy">ECONOMY</option>
+                <option value="education">EDUCATION</option>
+            </optgroup>
+            <optgroup label="CEFR Level C2">
+                <option value="energy">ENERGY</option>
+                <option value="entertainment">ENTERTAINMENT</option>
+                <option value="environment">ENVIRONMENT</option>
+                <option value="ethics">ETHICS</option>
+                <option value="finance">FINANCE</option>
+                <option value="geography">GEOGRAPHY</option>
+                <option value="government-and-politics">GOVERNMENT AND POLITICS</option>
+                <option value="health-and-medicine">HEALTH AND MEDICINE</option>
+                <option value="history">HISTORY</option>
+                <option value="humor">HUMOR</option>
+            </optgroup>
+        </select>
+        
+        <button id="start-game">Start Game</button>
+        <button id="check-answers">Check Answers</button>
+        <button id="show-solution">Show Solution</button>
+        <button id="new-game">New Game</button>
+    </div>
+    
+    <div id="game-area" class="hidden">
+        <div class="game-container">
+            <div class="sudoku-container">
+                <h2 id="game-title"></h2>
+                <p id="game-info"></p>
+                <div id="sudoku-grid"></div>
+                <div id="message" class="message hidden"></div>
+            </div>
+            
+            <div class="vocab-container">
+                <h3>Vocabulary Words</h3>
+                <div id="word-list" class="word-list"></div>
+                <h3>Vocabulary in Context</h3>
+                <div id="vocab-context"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Game data for all 60 themes
+        const gameData = {
+            // CEFR Level A1
+            "animals": {
+                title: "ANIMALS",
+                cefr: "A1",
+                difficulty: "EFFORTLESS",
+                size: 4,
+                words: ["MOUSE", "CAT", "FISH", "BIRD"],
+                grid: [
+                    ["BIRD", "", "", "CAT"],
+                    ["", "CAT", "BIRD", "FISH"],
+                    ["CAT", "", "FISH", "BIRD"],
+                    ["", "BIRD", "CAT", "MOUSE"]
+                ],
+                context: "Have you ever heard of a cat that could fly like a bird? Or maybe a dog that could swim like a fish? Sounds pretty ridiculous, doesn't it? Well, apparently, some people believe in these types of things. They think that cats can grow wings and soar through the sky, or that dogs can develop gills and breathe underwater like fish. It's no wonder why our world is in such a state of confusion when people believe in such absurdities. Let's stick to reality and leave the flights of fancy to the birds and fishes."
+            },
+            "body-parts": {
+                title: "BODY PARTS",
+                cefr: "A1",
+                difficulty: "EFFORTLESS",
+                size: 4,
+                words: ["HAND", "ARM", "LEG", "FOOT"],
+                grid: [
+                    ["", "FOOT", "", "HAND"],
+                    ["", "HAND", "LEG", "FOOT"],
+                    ["HAND", "ARM", "FOOT", ""],
+                    ["FOOT", "LEG", "HAND", ""]
+                ],
+                context: "Have you ever noticed how hands and feet are like the odd couples of the body? Hands get all the attention, with their dexterous fingers and ability to hold things, while feet are always down there, getting stepped on and stubbed. It's like arms and legs are just there to hold up these superstar appendages. And let's not forget the feet's jealous counterpart, the leg. While arms are flexing and showing off their muscles, legs are just trying to keep up with the feet's fancy footwork. It's a tough life for these underappreciated body parts, but someone's got to do it."
+            },
+            "clothing": {
+                title: "CLOTHING",
+                cefr: "A1",
+                difficulty: "MANAGEABLE",
+                size: 4,
+                words: ["HAT", "COAT", "T-SHIRT", "DRESS"],
+                grid: [
+                    ["", "", "DRESS", "HAT"],
+                    ["", "DRESS", "T-SHIRT", ""],
+                    ["", "HAT", "COAT", ""],
+                    ["COAT", "", "HAT", ""]
+                ],
+                context: "Have you ever wondered why we wear clothes? I mean, it's not like we're protecting ourselves from the elements or anything. We have houses for that. No, we wear clothes because we're trying to make a fashion statement. We slap on a hat or a T-short to show the world who we are or what we stand for. And don't even get me started on coats and dresses. If you're cold, just turn up the heat or put on a blanket. But no, we have to wear fancy coats and dresses just to impress other people. It's a crazy world we live in, where clothes are more than just clothes."
+            },
+            "colors": {
+                title: "COLORS",
+                cefr: "A1",
+                difficulty: "MANAGEABLE",
+                size: 4,
+                words: ["RED", "GREEN", "BLUE", "YELLOW"],
+                grid: [
+                    ["", "BLUE", "", "YELLOW"],
+                    ["GREEN", "YELLOW", "", ""],
+                    ["", "RED", "", "GREEN"],
+                    ["YELLOW", "", "RED", ""]
+                ],
+                context: "You know what's really great about colours? Nothing, that's what. I mean, what's the point of red, blue, green, and yellow anyway? They're just a bunch of hues that we use to differentiate one thing from another. I suppose you could argue that colours are important for safety, like when you need to stop at a red light or go on a green light. But really, it's just a bunch of nonsense. Who cares if something is red, blue, green, or yellow? It's not like it's going to change the world or anything."
+            },
+            "countries": {
+                title: "COUNTRIES",
+                cefr: "A1",
+                difficulty: "TOLERABLE",
+                size: 4,
+                words: ["USA", "UK", "AUSTRALIA", "CANADA"],
+                grid: [
+                    ["", "USA", "AUSTRALIA", ""],
+                    ["", "UK", "USA", ""],
+                    ["", "", "UK", "AUSTRALIA"],
+                    ["UK", "", "CANADA", ""]
+                ],
+                context: "It's funny how everyone always talks about the USA, Australia, UK, and Canada like they're the greatest countries on Earth. I mean, sure, they might have some good things going for them, like fast food, kangaroos, the Queen, and maple syrup. But have you ever heard of other countries like Bhutan, Seychelles, San Marino, or Liechtenstein? No? Well, that's because they don't get the same level of attention. It's a shame, really. Those countries might have some great things to offer, but nobody cares as long as they're not part of the big four."
+            },
+            "emotions": {
+                title: "EMOTIONS",
+                cefr: "A1",
+                difficulty: "TOLERABLE",
+                size: 4,
+                words: ["HAPPY", "SAD", "EXCITED", "ANGRY"],
+                grid: [
+                    ["EXCITED", "", "", ""],
+                    ["ANGRY", "", "", "EXCITED"],
+                    ["HAPPY", "", "EXCITED", ""],
+                    ["SAD", "", "ANGRY", ""]
+                ],
+                context: "Why do people always act like being happy and excited is the only way to live? I mean, sure, those emotions might feel good in the moment, but what about sadness and anger? They're just as valid, right? But no, we have to pretend like we're always happy and excited, or else we're seen as weak or negative. It's like we're not allowed to feel anything else. And don't even get me started on the pressure to be happy all the time. It's like if you're not happy, you're doing something wrong. What a load of nonsense. Let's embrace all our emotions, not just the \"good\" ones."
+            },
+            "family-members": {
+                title: "FAMILY MEMBERS",
+                cefr: "A1",
+                difficulty: "CHALLENGING",
+                size: 4,
+                words: ["MOTHER", "FATHER", "BROTHER", "SISTER"],
+                grid: [
+                    ["", "", "", "BROTHER"],
+                    ["", "", "FATHER", "SISTER"],
+                    ["SISTER", "", "BROTHER", ""],
+                    ["MOTHER", "", "SISTER", ""]
+                ],
+                context: "Family is a funny thing, isn't it? Mothers who always seem to know what's best for us, fathers who are always there to support us, brothers who can be both annoying and fun, and sisters who are always there to lend an ear. Sometimes they can drive us crazy, but other times they're our biggest supporters. They know us better than anyone else, and they're always there for us when we need them. Sure, they might have their flaws, but don't we all? At the end of the day, family is what matters most."
+            },
+            "food-and-drink": {
+                title: "FOOD AND DRINK",
+                cefr: "A1",
+                difficulty: "CHALLENGING",
+                size: 4,
+                words: ["PIZZA", "BURGER", "WATER", "JUICE"],
+                grid: [
+                    ["", "", "", "BURGER"],
+                    ["", "", "PIZZA", "JUICE"],
+                    ["", "WATER", "", ""],
+                    ["JUICE", "", "", "WATER"]
+                ],
+                context: "Food and drink, the ultimate dilemma. Do we go for the classic pizza or the juicy burger? And what about hydration? Do we stick with the boring water or switch it up with some sweet juice? It's enough to drive a person crazy. But fear not, for I have the solution. Just eat and drink whatever you want! Who cares about calories and nutrition anyway? It's all about indulging in whatever makes us feel good. Pizza, burger, water, juice, it's all fair game. So go ahead, have that second slice of pizza and wash it down with a sugary drink. You only live once, right?"
+            },
+            "fruits": {
+                title: "FRUITS",
+                cefr: "A1",
+                difficulty: "BACKBREAKING",
+                size: 4,
+                words: ["APPLE", "BANANA", "ORANGE", "GRAPE"],
+                grid: [
+                    ["", "", "", "GRAPE"],
+                    ["GRAPE", "ORANGE", "", ""],
+                    ["", "", "", "BANANA"],
+                    ["APPLE", "", "", "ORANGE"]
+                ],
+                context: "Fruit, the so-called \"healthy\" food. Apples, bananas, oranges, grapes. They're supposed to be good for us, right? But who has time for all that chewing and peeling? And let's not forget about the mess. Have you ever tried eating an orange without getting juice all over your face? It's impossible. And don't even get me started on grapes. They're like little time bombs waiting to explode in your mouth. It's a wonder anyone eats fruit at all. Give me a nice, easy-to-eat snack any day. Maybe a bag of chips or a candy bar. Now that's what I call convenience."
+            },
+            "hobbies": {
+                title: "HOBBIES",
+                cefr: "A1",
+                difficulty: "BACKBREAKING",
+                size: 4,
+                words: ["READING", "DRAWING", "SWIMMING", "DANCING"],
+                grid: [
+                    ["", "", "", "DRAWING"],
+                    ["", "DRAWING", "", "DANCING"],
+                    ["", "", "DRAWING", ""],
+                    ["DRAWING", "", "", ""]
+                ],
+                context: "Ah, hobbies. The things we do to pass the time. Reading, drawing, swimming, dancing. But who has time for all that? Reading requires too much concentration, drawing is just a fancy way of doodling, swimming is a hassle to get to, and dancing is just plain embarrassing. Why bother with any of it? Instead, let's just sit on the couch and watch TV all day. That's what real relaxation is all about. Who needs the stress of learning a new hobby when we can just veg out and watch Netflix? It's the true path to happiness."
+            },
+            // CEFR Level A2
+            "holidays": {
+                title: "HOLIDAYS",
+                cefr: "A2",
+                difficulty: "EFFORTLESS",
+                size: 4,
+                words: ["ACCOMMODATION", "ITINERARY", "SOUVENIR", "SIGHTSEEING"],
+                grid: [
+                    ["ACCOMMODATION", "", "", "SIGHTSEEING"],
+                    ["ITINERARY", "", "SOUVENIR", "ACCOMMODATION"],
+                    ["SOUVENIR", "ACCOMMODATION", "", "ITINERARY"],
+                    ["SIGHTSEEING", "ITINERARY", "ACCOMMODATION", ""]
+                ],
+                context: "Holidays, the ultimate excuse to overspend. We have to have the best accommodation, follow the strictest itinerary, see all the sights, and buy all the souvenirs. It's like we're in a competition with ourselves to see who can spend the most money. And don't even get me started on the souvenirs. Who needs another useless trinket to clutter up our homes? And let's not forget about the pressure to see everything on the itinerary. We can't just enjoy ourselves, we have to cram in as much sightseeing as possible, just to prove we've been there. It's like we're not allowed to have fun unless we're checking off boxes on a list. Maybe it's time to slow down and enjoy the moment, instead of worrying about what comes next."
+            },
+            "house-and-home": {
+                title: "HOUSE AND HOME",
+                cefr: "A2",
+                difficulty: "EFFORTLESS",
+                size: 4,
+                words: ["FURNITURE", "APPLIANCES", "CURTAIN", "UTENSILS"],
+                grid: [
+                    ["", "UTENSILS", "", "FURNITURE"],
+                    ["", "FURNITURE", "CURTAINS", "UTENSILS"],
+                    ["FURNITURE", "CURTAINS", "UTENSILS", ""],
+                    ["UTENSILS", "APPLIANCES", "", "CURTAINS"]
+                ],
+                context: "Furniture, appliances, curtains, utensils. They're all just things, right? But why do we bother with them? Furniture just takes up space, appliances break down, curtains are a hassle to clean, and utensils are just annoying to wash. It's like we're always surrounded by clutter and chaos. And let's not forget about all the money we spend on this stuff. It's like we're always chasing the latest trend or gadget, just to keep up with everyone else. But at the end of the day, do we really need all this stuff? Maybe it's time to simplify our lives and live with less. Who needs furniture when we can sit on the floor? Who needs appliances when we can cook over a fire? Who needs curtains when we can just hang a sheet? And who needs utensils when we can eat with our hands?"
+            },
+            "jobs-and-professions": {
+                title: "JOBS AND PROFESSIONS",
+                cefr: "A2",
+                difficulty: "MANAGEABLE",
+                size: 4,
+                words: ["CARPENTER", "ELECTRICIAN", "RECEPTIONIST", "PLUMBER"],
+                grid: [
+                    ["ELECTRICIAN", "PLUMBER", "", ""],
+                    ["RECEPTIONIST", "CARPENTER", "", "PLUMBER"],
+                    ["", "", "RECEPTIONIST", "CARPENTER"],
+                    ["CARPENTER", "", "PLUMBER", "ELECTRICIAN"]
+                ],
+                context: "Careers are an interesting concept, aren't they? Carpenter, electrician, receptionist, plumber. They all require different skills and abilities. But sometimes it can feel like we're stuck in a box, defined by our job title. And let's not forget about the pressure to succeed. We have to work hard and climb the corporate ladder, just to prove our worth. But maybe it's time to redefine success. Maybe success is just being happy and content with our lives, regardless of our job title. Maybe it's time to embrace our passions and pursue careers that align with our values. Who says we have to follow the traditional path? It's time to break free and create our own definition of success."
+            },
+            "kitchen-items": {
+                title: "KITCHEN ITEMS",
+                cefr: "A2",
+                difficulty: "MANAGEABLE",
+                size: 4,
+                words: ["DISHWASHER", "BLENDER", "COLANDER", "GRANTER"],
+                grid: [
+                    ["COLANDER", "", "", "DISHWASHER"],
+                    ["DISHWASHER", "", "", "COLANDER"],
+                    ["", "DISHWASHER", "COLANDER", ""],
+                    ["GRANTER", "", "DISHWASHER", ""]
+                ],
+                context: "Kitchen gadgets, the ultimate way to waste money. Dishwasher, blender, colander, grater. They're supposed to make our lives easier, right? But who has time for all that washing and chopping? And let's not forget about the clutter. Why bother with all these unnecessary gadgets when we can just use our hands? It's like we're in a competition with ourselves to see who can have the fanciest kitchen. And don't even get me started on the grater. Who needs shredded cheese anyway? Maybe it's time to simplify our lives and just eat out of a can. Who needs a dishwasher when we can just lick our plates clean?"
+            },
+            "music": {
+                title: "MUSIC",
+                cefr: "A2",
+                difficulty: "TOLERABLE",
+                size: 4,
+                words: ["COMPOSER", "ORCHESTRA", "LYRICS", "CHORUS"],
+                grid: [
+                    ["ORCHESTRA", "", "", ""],
+                    ["", "COMPOSER", "", "LYRICS"],
+                    ["COMPOSER", "", "", "CHORUS"],
+                    ["", "", "COMPOSER", "ORCHESTRA"]
+                ],
+                context: "Music is an interesting art form, isn't it? Composers create the melodies and orchestras bring them to life. Lyrics add a poetic element and the chorus adds a powerful group dynamic. But sometimes it can feel overwhelming. Who has time to create all these intricate pieces that work seamlessly together? And let's not forget about the pressure to create something truly unique and groundbreaking. But maybe it's time to simplify things. Maybe we can create beautiful music with just a few notes and a simple melody. Maybe we don't need lyrics or a chorus to convey emotions and feelings. Maybe we can just let the music speak for itself. Let's embrace the power of simplicity and create something truly beautiful."
+            },
+            "musical-instruments": {
+                title: "MUSICAL INSTRUMENTS",
+                cefr: "A2",
+                difficulty: "TOLERABLE",
+                size: 4,
+                words: ["SAXOPHONE", "FLUTE", "TROMBONE", "HARP"],
+                grid: [
+                    ["", "", "", "FLUTE"],
+                    ["FLUTE", "", "HARP", ""],
+                    ["SAXOPHONE", "", "", "HARP"],
+                    ["TROMBONE", "HARP", "", ""]
+                ],
+                context: "Music is an interesting art form, isn't it? Saxophones, flutes, trombones, and harps all have unique sounds and qualities. They each add something special to a musical arrangement. But sometimes it can feel overwhelming. How do we choose which instrument to learn or play? And let's not forget about the time and effort required to master an instrument. But maybe it's time to embrace the power of experimentation. Maybe we can dabble in multiple instruments and create a unique sound all our own. Maybe we don't have to be experts to enjoy playing music. Let's embrace the joy of creation and see where our musical curiosity takes us."
+            },
+            "nature": {
+                title: "NATURE",
+                cefr: "A2",
+                difficulty: "CHALLENGING",
+                size: 4,
+                words: ["LANDSCAPE", "CLIMATE", "ECOSYSTEM", "WILDERNESS"],
+                grid: [
+                    ["", "", "WILDERNESS", ""],
+                    ["", "WILDERNESS", "", "CLIMATE"],
+                    ["", "ECOSYSTEM", "", ""],
+                    ["", "CLIMATE", "", "WILDERNESS"]
+                ],
+                context: "Nature, the ultimate way to escape reality. Landscape, climate, ecosystem, wilderness. They're supposed to be the perfect antidote to our stressful lives, right? But who has time for all that hiking and camping? And let's not forget about the bugs. Why bother with all these outdoor activities when we can just sit inside and watch nature documentaries? It's like we're all trying to prove we're one with the earth or something. And don't even get me started on the wilderness. Who needs all that fresh air anyway? Maybe it's time to embrace the power of air conditioning and forget about all this natural nonsense. Who needs a landscape when we can just look at a picture?"
+            },
+            "occupations": {
+                title: "OCCUPATIONS",
+                cefr: "A2",
+                difficulty: "CHALLENGING",
+                size: 4,
+                words: ["ARCHITECT", "NURSE", "SCIENTIST", "JOURNALIST"],
+                grid: [
+                    ["", "NURSE", "", ""],
+                    ["JOURNALIST", "ARCHITECT", "", ""],
+                    ["", "SCIENTIST", "ARCHITECT", ""],
+                    ["", "JOURNALIST", "SCIENTIST", ""]
+                ],
+                context: "Careers, the ultimate way to pigeonhole ourselves. Architect, nurse, scientist, journalist. They're supposed to be the perfect fit for our skills and interests, right? But who has time for all that soul-searching and career planning? And let's not forget about the competition. Why bother with all these high-stress jobs when we can just work at a fast food restaurant? It's like we're all trying to prove we're the best at something. And don't even get me started on the journalists. Who needs the truth anyway? Maybe it's time to
